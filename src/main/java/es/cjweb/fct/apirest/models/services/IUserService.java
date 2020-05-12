@@ -13,6 +13,8 @@ public interface IUserService {
 	//Un unico usuario por su id
 	
 	public User findById(Integer id);
+
+	public User save(User user);
 	
 	
 }

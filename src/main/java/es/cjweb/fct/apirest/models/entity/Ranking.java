@@ -10,49 +10,55 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="ranking")
+@Table(name="rankings")
 
 public class Ranking implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int cod_rank;
+	private int id;
 	
 	private int posicion;
 	
-	//Relación 1 Ranking M usuarios, mapeado por la clave foranea cod rank en la entidad user, tipo cascada para en caso de
-	//borrado del usuario se borren los registros hijos en esta entidad ranking.
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "cod_rank", cascade = CascadeType.ALL)
-	private List<User> users;
+	//Relación 1 Ranking 1 usuarios, mapeado por la clave foranea cod rank en la entidad user, tipo cascada para en caso de
+	//borrado del usuario se borren el registro hijo en esta entidad ranking.
+	@OneToOne(mappedBy = "ranking", cascade = CascadeType.ALL)
+	private User user;
 	
 	
 	
 	public Ranking() {
-		this.users = new ArrayList<User>();
+		
 	}
-	public int getCod_rank() {
-		return cod_rank;
+	
+	public int getId() {
+		return id;
 	}
-	public void setCod_rank(int cod_rank) {
-		this.cod_rank = cod_rank;
+
+	public void setId(int id) {
+		this.id = id;
 	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	public int getPosicion() {
 		return posicion;
 	}
 	public void setPosicion(int posicion) {
 		this.posicion = posicion;
 	}
-	public List<User> getUsers() {
-		return users;
-	}
-	public void setUsers(List<User> users) {
-		this.users = users;
-	}
-	
-	 
+
 	
 }

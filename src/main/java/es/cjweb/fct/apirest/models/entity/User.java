@@ -1,6 +1,7 @@
 package es.cjweb.fct.apirest.models.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,23 +12,32 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name="users")
 public class User implements Serializable{
 	
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
 	private String email;
 	private String pass;
-	private boolean verify;
+	private boolean verified;
 	private String verification_token;
 	private boolean user_admin;
 	private int movil;
@@ -37,12 +47,30 @@ public class User implements Serializable{
 	private String nombre;
 	private String apellidos;
 	private String foto;
-	
 	private int cod_rank;
 	
-	@ManyToOne(fetch=FetchType.LAZY)
+	@OneToOne
+	@JoinColumn(name="id")
 	private Ranking ranking;
 	
+	//Relacion de un Usuario tiene muchas citas, mapeado por el atributo id_user de tipo User en la clase cita.
+	@JsonIgnoreProperties(value={"user", "hibernateLazyInitializer", "handler"}, allowSetters=true)
+	@OneToMany(mappedBy = "user",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+	private List<Cita> citas;
+	
+
+	public void setVerified(boolean verified) {
+		this.verified = verified;
+	}
+
+
+
+	public User() {
+		this.citas = new ArrayList<Cita>();
+	}
+
+
+
 	@PrePersist
 	public void prePersist() {
 		this.fecha_registro = new Date();
@@ -66,11 +94,11 @@ public class User implements Serializable{
 	public void setPass(String pass) {
 		this.pass = pass;
 	}
-	public boolean isVerify() {
-		return verify;
+	public boolean isVerified() {
+		return verified;
 	}
-	public void setVerify(boolean verify) {
-		this.verify = verify;
+	public void setVerify(boolean verified) {
+		this.verified = verified;
 	}
 	public String getVerification_token() {
 		return verification_token;
@@ -118,10 +146,34 @@ public class User implements Serializable{
 		this.foto = foto;
 	}
 
+	
+
 	public int getCod_rank() {
 		return cod_rank;
 	}
+
+
+
 	public void setCod_rank(int cod_rank) {
 		this.cod_rank = cod_rank;
 	}
+
+
+
+	public List<Cita> getCitas() {
+		return citas;
+	}
+
+	public void setCitas(List<Cita> citas) {
+		this.citas = citas;
+	}
+
+
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	
+	
 }

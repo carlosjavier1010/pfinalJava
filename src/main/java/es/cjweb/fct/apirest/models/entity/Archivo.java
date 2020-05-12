@@ -23,11 +23,17 @@ public class Archivo {
 	private Date fecha;
 	private String ruta;
 	
-	private int id_user;
+
 	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name = "user_id")
+	@ManyToOne
+	@JoinColumn(name = "userId")
 	private User user;
+
+	
+	
+	public Archivo() {
+		
+	}
 
 	public int getId() {
 		return id;
@@ -69,14 +75,6 @@ public class Archivo {
 		this.ruta = ruta;
 	}
 
-	public int getId_user() {
-		return id_user;
-	}
-
-	public void setId_user(int id_user) {
-		this.id_user = id_user;
-	}
-
 	public User getUser() {
 		return user;
 	}
@@ -84,7 +82,8 @@ public class Archivo {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	
-	
+
+
+
 	
 }

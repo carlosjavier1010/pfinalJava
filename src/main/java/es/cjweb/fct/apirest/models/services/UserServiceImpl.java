@@ -32,4 +32,10 @@ public class UserServiceImpl implements IUserService{
 		return userDao.findById(id).orElse(null);
 	}
 
+	@Override
+	public User save(User user) {
+		return userDao.save(user);
+		
+	}
+
 }

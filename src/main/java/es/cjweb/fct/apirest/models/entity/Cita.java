@@ -3,28 +3,46 @@ package es.cjweb.fct.apirest.models.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name="citas")
 public class Cita implements Serializable {
+
+
+
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
 	private Date fecha;
 	private boolean estado;
-	
-	private int id_user;
-	
-	@ManyToOne(fetch=FetchType.LAZY)
+	@JsonIgnoreProperties(value={"users", "hibernateLazyInitializer", "handler"}, allowSetters=true)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="user_id")
 	private User user;
+	
+	
+
+	
+
+	public Date getFecha() {
+		return fecha;
+	}
+
+	public Cita() {
+		
+	}
 
 	public int getId() {
 		return id;
@@ -32,10 +50,6 @@ public class Cita implements Serializable {
 
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public Date getFecha() {
-		return fecha;
 	}
 
 	public void setFecha(Date fecha) {
@@ -50,14 +64,6 @@ public class Cita implements Serializable {
 		this.estado = estado;
 	}
 
-	public int getId_user() {
-		return id_user;
-	}
-
-	public void setId_user(int id_user) {
-		this.id_user = id_user;
-	}
-
 	public User getUser() {
 		return user;
 	}
@@ -65,7 +71,8 @@ public class Cita implements Serializable {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	
+
+
 	
 }
 
