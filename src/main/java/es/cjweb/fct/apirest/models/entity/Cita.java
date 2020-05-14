@@ -1,9 +1,11 @@
 package es.cjweb.fct.apirest.models.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 
-import javax.persistence.CascadeType;
+import java.util.Calendar;
+
+
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -22,10 +25,14 @@ public class Cita implements Serializable {
 
 
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
-	private Date fecha;
+	private Calendar fecha;
 	private boolean estado;
 	@JsonIgnoreProperties(value={"users", "hibernateLazyInitializer", "handler"}, allowSetters=true)
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -36,7 +43,7 @@ public class Cita implements Serializable {
 
 	
 
-	public Date getFecha() {
+	public Calendar getFecha() {
 		return fecha;
 	}
 
@@ -52,7 +59,7 @@ public class Cita implements Serializable {
 		this.id = id;
 	}
 
-	public void setFecha(Date fecha) {
+	public void setFecha(Calendar fecha) {
 		this.fecha = fecha;
 	}
 

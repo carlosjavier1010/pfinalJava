@@ -12,4 +12,6 @@ public interface ICitaService {
 	//Una unica cita por su id
 	
 		public Cita findById(Integer id);
+
+		public void save(Cita cita);
 }

@@ -1,7 +1,10 @@
 package es.cjweb.fct.apirest.controllers;
 
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Optional;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -11,9 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.cjweb.fct.apirest.models.entity.Cita;
-import es.cjweb.fct.apirest.models.entity.User;
 import es.cjweb.fct.apirest.models.services.ICitaService;
-import es.cjweb.fct.apirest.models.services.IUserService;
+
 
 @CrossOrigin(origins= {"http://localhost:4200","http://localhost:8080"})
 @RestController
@@ -30,6 +32,11 @@ public class CitaRestController {
 	
 	@RequestMapping(value="/citas/{id}",method=RequestMethod.GET)
 	public Cita findById(@PathVariable("id") Integer id){
+		
+		Cita cita = this.citaService.findById(id);
+		Calendar fecha = new GregorianCalendar(2020, Calendar.JANUARY, 22, 18, 30);
+		cita.setFecha(fecha);
+		this.citaService.save(cita);
 		return this.citaService.findById(id);
 	}
 	

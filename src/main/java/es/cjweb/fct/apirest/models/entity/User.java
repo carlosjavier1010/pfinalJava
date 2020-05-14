@@ -13,7 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
@@ -58,6 +57,9 @@ public class User implements Serializable{
 	@OneToMany(mappedBy = "user",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
 	private List<Cita> citas;
 	
+	@JsonIgnoreProperties(value={"user", "hibernateLazyInitializer", "handler"}, allowSetters=true)
+	@OneToMany(mappedBy = "user",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+	private List<Archivo> archivos;
 
 	public void setVerified(boolean verified) {
 		this.verified = verified;
@@ -67,6 +69,7 @@ public class User implements Serializable{
 
 	public User() {
 		this.citas = new ArrayList<Cita>();
+		this.archivos = new ArrayList<Archivo>();
 	}
 
 
@@ -168,8 +171,7 @@ public class User implements Serializable{
 		this.citas = citas;
 	}
 
-
-
+	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

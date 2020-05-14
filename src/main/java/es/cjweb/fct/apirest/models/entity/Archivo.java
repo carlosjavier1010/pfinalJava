@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name="archivos")
 public class Archivo {
@@ -23,10 +25,9 @@ public class Archivo {
 	private Date fecha;
 	private String ruta;
 	
-
-	
-	@ManyToOne
-	@JoinColumn(name = "userId")
+	@JsonIgnoreProperties(value={"users", "hibernateLazyInitializer", "handler"}, allowSetters=true)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="user_id")
 	private User user;
 
 	

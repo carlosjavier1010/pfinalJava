@@ -26,5 +26,11 @@ public class CitaServiceImpl implements ICitaService{
 		return citaDao.findById(id).orElse(null);
 	}
 
+	@Override
+	public void save(Cita cita) {
+		citaDao.save(cita);
+		
+	}
+
 	
 }
