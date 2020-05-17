@@ -3,18 +3,18 @@ package es.cjweb.fct.apirest.models.services;
 import java.util.List;
 
 
-import es.cjweb.fct.apirest.models.entity.User;
+import es.cjweb.fct.apirest.models.entity.Usuario;
 
 public interface IUserService {
 	
 	//Listado de usuarios completo
-	public List<User> findAll();
+	public List<Usuario> findAll();
 	
 	//Un unico usuario por su id
 	
-	public User findById(Integer id);
+	public Usuario findById(Integer id);
 
-	public User save(User user);
+	public Usuario save(Usuario user);
 	
-	
+	public Usuario findByEmail(String username);
 }

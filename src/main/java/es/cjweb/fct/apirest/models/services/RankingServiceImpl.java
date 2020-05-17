@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.cjweb.fct.apirest.models.dao.IRankingDao;
 import es.cjweb.fct.apirest.models.entity.Ranking;
-import es.cjweb.fct.apirest.models.entity.User;
+import es.cjweb.fct.apirest.models.entity.Usuario;
 
 @Service
 public class RankingServiceImpl implements IRankingService {

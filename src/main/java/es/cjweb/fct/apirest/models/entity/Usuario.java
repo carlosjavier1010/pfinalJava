@@ -13,18 +13,21 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name="users")
-public class User implements Serializable{
+public class Usuario implements Serializable{
 	
 
 	/**
@@ -61,13 +64,19 @@ public class User implements Serializable{
 	@OneToMany(mappedBy = "user",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
 	private List<Archivo> archivos;
 
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name="usersroles", joinColumns = @JoinColumn(name="user_id"),
+	inverseJoinColumns = @JoinColumn(name="role_id"),
+	uniqueConstraints = {@UniqueConstraint(columnNames= {"user_id","role_id"})})
+	private List<Role> roles;
+	
 	public void setVerified(boolean verified) {
 		this.verified = verified;
 	}
 
 
 
-	public User() {
+	public Usuario() {
 		this.citas = new ArrayList<Cita>();
 		this.archivos = new ArrayList<Archivo>();
 	}
@@ -170,8 +179,21 @@ public class User implements Serializable{
 	public void setCitas(List<Cita> citas) {
 		this.citas = citas;
 	}
-
 	
+	
+	
+	public List<Role> getRoles() {
+		return roles;
+	}
+
+
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
+	}
+
+
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

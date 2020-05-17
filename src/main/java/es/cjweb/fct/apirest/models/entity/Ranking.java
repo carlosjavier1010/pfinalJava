@@ -30,7 +30,7 @@ public class Ranking implements Serializable{
 	//Relación 1 Ranking 1 usuarios, mapeado por la clave foranea cod rank en la entidad user, tipo cascada para en caso de
 	//borrado del usuario se borren el registro hijo en esta entidad ranking.
 	@OneToOne(mappedBy = "ranking", cascade = CascadeType.ALL)
-	private User user;
+	private Usuario user;
 	
 	
 	
@@ -46,11 +46,11 @@ public class Ranking implements Serializable{
 		this.id = id;
 	}
 
-	public User getUser() {
+	public Usuario getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(Usuario user) {
 		this.user = user;
 	}
 

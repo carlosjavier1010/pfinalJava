@@ -28,7 +28,7 @@ public class Archivo {
 	@JsonIgnoreProperties(value={"users", "hibernateLazyInitializer", "handler"}, allowSetters=true)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="user_id")
-	private User user;
+	private Usuario user;
 
 	
 	
@@ -76,11 +76,11 @@ public class Archivo {
 		this.ruta = ruta;
 	}
 
-	public User getUser() {
+	public Usuario getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(Usuario user) {
 		this.user = user;
 	}
 

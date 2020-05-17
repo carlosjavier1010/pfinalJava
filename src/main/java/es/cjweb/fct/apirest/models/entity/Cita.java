@@ -37,7 +37,7 @@ public class Cita implements Serializable {
 	@JsonIgnoreProperties(value={"users", "hibernateLazyInitializer", "handler"}, allowSetters=true)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="user_id")
-	private User user;
+	private Usuario user;
 	
 	
 
@@ -71,11 +71,11 @@ public class Cita implements Serializable {
 		this.estado = estado;
 	}
 
-	public User getUser() {
+	public Usuario getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(Usuario user) {
 		this.user = user;
 	}
 
