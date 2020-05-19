@@ -9,7 +9,7 @@ import es.cjweb.fct.apirest.models.entity.Usuario;
 public interface IUserDao extends JpaRepository<Usuario, Integer>{
 
 	Usuario findByEmail(String username);
-
+	Usuario findByNombre(String username);
 	
 
 

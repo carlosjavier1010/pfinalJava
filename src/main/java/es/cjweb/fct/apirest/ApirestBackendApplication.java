@@ -19,7 +19,7 @@ public class ApirestBackendApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		String password = "1234";
+		String password = "12345";
 		
 		for (int i = 0; i < 4; i++) {
 			String passwordBcrypt = passwordEncoder.encode(password);

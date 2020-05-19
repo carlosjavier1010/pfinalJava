@@ -72,6 +72,12 @@ public class UserServiceImpl implements IUserService , UserDetailsService{
 		return new User(usuario.getEmail(), usuario.getPass(), usuario.isVerified(), true, true, true, authorities);
 	}
 
+	@Override
+	public Usuario findByNombre(String username) {
+		// TODO Apéndice de método generado automáticamente
+		return userDao.findByNombre(username);
+	}
+
 	
 
 }
