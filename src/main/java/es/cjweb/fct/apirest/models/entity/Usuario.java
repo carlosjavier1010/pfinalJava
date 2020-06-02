@@ -38,6 +38,7 @@ public class Usuario implements Serializable{
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
 	private String email;
+	private String direccion;
 	private String pass;
 	private boolean verified;
 	private String verification_token;
@@ -45,7 +46,7 @@ public class Usuario implements Serializable{
 	private int movil;
 	@Column(name="fecha_registro")
 	@Temporal(TemporalType.DATE)
-	private Date fecha_registro;
+	private Date fechaRegistro;
 	private String nombre;
 	private String apellidos;
 	private String foto;
@@ -79,13 +80,14 @@ public class Usuario implements Serializable{
 	public Usuario() {
 		this.citas = new ArrayList<Cita>();
 		this.archivos = new ArrayList<Archivo>();
+		
 	}
 
 
 
 	@PrePersist
 	public void prePersist() {
-		this.fecha_registro = new Date();
+		this.fechaRegistro = new Date();
 	}
 	
 	public int getId() {
@@ -100,9 +102,19 @@ public class Usuario implements Serializable{
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	
+	public String getDireccion() {
+		return direccion;
+	}
+
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+
 	public String getPass() {
 		return pass;
 	}
+
 	public void setPass(String pass) {
 		this.pass = pass;
 	}
@@ -130,11 +142,11 @@ public class Usuario implements Serializable{
 	public void setMovil(int movil) {
 		this.movil = movil;
 	}
-	public Date getFecha_registro() {
-		return fecha_registro;
+	public Date getFechaRegistro() {
+		return fechaRegistro;
 	}
-	public void setFecha_registro(Date fecha_registro) {
-		this.fecha_registro = fecha_registro;
+	public void setFechaRegistro(Date fecha_registro) {
+		this.fechaRegistro = fecha_registro;
 	}
 	public String getNombre() {
 		return nombre;

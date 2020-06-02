@@ -51,18 +51,26 @@ public class UserServiceImpl implements IUserService , UserDetailsService{
 	@Override
 	public Usuario findByEmail(String username) {
 		// TODO Apéndice de método generado automáticamente
+		
 		return userDao.findByEmail(username);
 	}
 	
 	@Override
 	@Transactional(readOnly = true)
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		//Como el email llega a traves de url, el simbolo @ es reemplazado por %40, entonces aqui antes
+		//de buscar el usuario por el email, cambiamos el %40 por @
+		 if(username.contains("%40")){
+	            username = username.replace("%40","@");
+	        }
 		Usuario usuario = userDao.findByEmail(username);
 		
 		if (usuario == null) {
 			logger.error("Error en el login: no existe el usuario "+username+" en el sistema!");
 			throw new UsernameNotFoundException("Error en el login: no existe el usuario "+username+" en el sistema!");
 		}
+		
+		
 		
 		List<GrantedAuthority> authorities = usuario.getRoles()
 				.stream()

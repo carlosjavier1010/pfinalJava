@@ -6,9 +6,12 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import es.cjweb.fct.apirest.models.entity.Cita;
 import es.cjweb.fct.apirest.models.entity.Usuario;
 import es.cjweb.fct.apirest.models.services.IUserService;
 
@@ -38,5 +41,14 @@ public class UserRestController {
 		return this.userService.findById(id);
 	}
 	
-	
+	@RequestMapping(value="/clientes/{id}",method=RequestMethod.PUT)
+	public Usuario update(@RequestBody Usuario usuario, @PathVariable Integer id){
+		Usuario usuarioActual = userService.findById(id);
+		usuarioActual.setNombre(usuario.getNombre());
+		usuarioActual.setApellidos(usuario.getApellidos());
+		usuarioActual.setEmail(usuario.getEmail());
+		usuarioActual.setDireccion(usuario.getDireccion());
+		usuarioActual.setMovil(usuario.getMovil());
+		return this.userService.save(usuarioActual);
+	}
 }
