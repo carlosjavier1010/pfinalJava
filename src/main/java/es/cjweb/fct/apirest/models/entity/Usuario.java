@@ -52,6 +52,8 @@ public class Usuario implements Serializable{
 	private String foto;
 	private int cod_rank;
 	
+	private int cantidad;
+	
 	@OneToOne
 	@JoinColumn(name="id")
 	private Ranking ranking;
@@ -78,8 +80,9 @@ public class Usuario implements Serializable{
 
 
 	public Usuario() {
-		this.citas = new ArrayList<Cita>();
+		
 		this.archivos = new ArrayList<Archivo>();
+		this.citas = new ArrayList<Cita>();
 		
 	}
 
@@ -184,13 +187,6 @@ public class Usuario implements Serializable{
 
 
 
-	public List<Cita> getCitas() {
-		return citas;
-	}
-
-	public void setCitas(List<Cita> citas) {
-		this.citas = citas;
-	}
 	
 	
 	
@@ -210,6 +206,31 @@ public class Usuario implements Serializable{
 		return serialVersionUID;
 	}
 
+
+	public int getCantidad() {
+		
+		return cantidad;
+	}
+
+
+	public void setCantidad(int cantidad) {
+		this.cantidad = this.cantidad+1;
+	}
+
+	public void resetCantidad() {
+		this.cantidad = 0;
+	}
+
+	public List<Cita> getCitas() {
+		return citas;
+	}
+
+	
+
+	public void setCitas(List<Cita> citas) {
+		this.citas = citas;
+	}
+	
 	
 	
 }

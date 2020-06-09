@@ -19,4 +19,7 @@ public interface IUserService {
 	public Usuario findByEmail(String username);
 
 	public Usuario findByNombre(String username);
+
+
+	public void deleteById(Integer id);
 }

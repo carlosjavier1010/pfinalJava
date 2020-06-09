@@ -41,4 +41,6 @@ public class ArchivoRestController {
 	public Archivo findByUserId(@PathVariable("id") Integer id){
 		return this.archivoService.findByUserId(id);
 	}
+	
+	
 }

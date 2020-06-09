@@ -1,5 +1,6 @@
 package es.cjweb.fct.apirest.models.dao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +15,12 @@ import es.cjweb.fct.apirest.models.entity.Usuario;
 public interface ICitaDao extends JpaRepository<Cita, Integer>{
 	
 	List<Cita> findAllByUserOrderByFechaDesc(Optional<Usuario> usuario);
+	List<Cita> findAllByEstadoTrue();
+	List<Cita> findAllByEstadoFalse();
 	
 	@Query("select c from Cita c where c.fecha BETWEEN :fecha and :fechaf")
     List<Cita> findAllByFecha(@Param("fecha") Date fecha, @Param("fechaf") Date fechaf);
+	
+	List<Cita> countByUser(Optional<Usuario> usuario);
+	
 }

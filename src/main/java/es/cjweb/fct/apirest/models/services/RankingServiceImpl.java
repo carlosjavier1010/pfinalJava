@@ -28,4 +28,10 @@ public class RankingServiceImpl implements IRankingService {
 		// TODO Apéndice de método generado automáticamente
 		return rankingDao.findById(id).orElse(null);
 	}
+
+	@Override
+	public void save(Ranking create) {
+		 rankingDao.save(create);
+		
+	}
 }

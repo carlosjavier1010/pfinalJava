@@ -2,6 +2,7 @@ package es.cjweb.fct.apirest.models.services;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -71,4 +72,20 @@ public class CitaServiceImpl implements ICitaService{
 		}
 		return citaDao.findAllByFecha(fechaNueva,fechaFin);
 	}
+
+	@Override
+	public List<Cita> findAllByEstadoTrue() {
+		
+		return citaDao.findAllByEstadoTrue();
+	}
+	
+	@Override
+	public List<Cita> findAllByEstadoFalse() {
+		
+		return citaDao.findAllByEstadoFalse();
+	}
+
+
+
+
 }

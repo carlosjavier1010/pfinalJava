@@ -1,18 +1,42 @@
 package es.cjweb.fct.apirest.controllers;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+
+
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import es.cjweb.fct.apirest.models.entity.Cita;
+import es.cjweb.fct.apirest.models.entity.Ranking;
 import es.cjweb.fct.apirest.models.entity.Usuario;
+import es.cjweb.fct.apirest.models.services.IRankingService;
 import es.cjweb.fct.apirest.models.services.IUserService;
 
 @CrossOrigin(origins= {"http://localhost:4200","http://localhost:8080"})
@@ -23,11 +47,17 @@ public class UserRestController {
 	@Autowired
 	private IUserService userService;
 	
+	@Autowired
+	private IRankingService rankService;
+	
 	@RequestMapping(value="/clientes",method=RequestMethod.GET)
 	public List<Usuario> findAll(){
 		return this.userService.findAll();
 	}
 	
+
+	
+	@Secured({"ROLE_ADMIN","ROLE_USER"})
 	@RequestMapping(value="/clientes/{id}",method=RequestMethod.GET)
 	public Usuario findById(@PathVariable("id") Integer id){
 		//prueba cambiandole el codigo del ranking a un usuario
@@ -41,6 +71,29 @@ public class UserRestController {
 		return this.userService.findById(id);
 	}
 	
+	
+	@RequestMapping(value="/clientes",method=RequestMethod.POST, produces = { MimeTypeUtils.APPLICATION_JSON_VALUE},
+			consumes = { MimeTypeUtils.APPLICATION_JSON_VALUE })	
+	@ResponseStatus(HttpStatus.CREATED)
+	public Usuario create(@RequestBody Usuario usuario){
+		usuario.setVerify(true);
+		
+		List<Ranking> rank = rankService.findAll();
+		Ranking create = new Ranking();
+		int valorMin = 0;
+		
+		for (Ranking ranking : rank) {
+			if (ranking.getPosicion() > valorMin) {
+				valorMin = ranking.getPosicion();
+			}
+		}
+		valorMin++;
+		create.setPosicion(valorMin);
+		this.rankService.save(create);
+		usuario.setCod_rank(valorMin);
+		return this.userService.save(usuario);
+	}
+	
 	@RequestMapping(value="/clientes/{id}",method=RequestMethod.PUT)
 	public Usuario update(@RequestBody Usuario usuario, @PathVariable Integer id){
 		Usuario usuarioActual = userService.findById(id);
@@ -51,4 +104,87 @@ public class UserRestController {
 		usuarioActual.setMovil(usuario.getMovil());
 		return this.userService.save(usuarioActual);
 	}
+	
+	// @Secured({"ROLE_ADMIN"})
+	@RequestMapping(value="/clientes/{id}",method=RequestMethod.DELETE)
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void delete(@PathVariable Integer id){
+		Usuario usuario = userService.findById(id);
+		String nombreFotoAnterior = usuario.getFoto();
+		
+		if (nombreFotoAnterior != null && nombreFotoAnterior.length() > 0) {
+			Path rutaFotoAnterior = Paths.get("uploads").resolve(nombreFotoAnterior).toAbsolutePath();
+			File archivoFotoAnterior = rutaFotoAnterior.toFile();
+			if (archivoFotoAnterior.exists() && archivoFotoAnterior.canRead()) {
+				archivoFotoAnterior.delete();
+			}
+		}
+		
+		this.userService.deleteById(id);
+	}
+	
+	
+	@PostMapping("/clientes/upload")
+	public ResponseEntity<?> upload(@RequestParam("archivo") MultipartFile archivo, @RequestParam("id") Integer id){
+		Map<String,Object> response = new HashMap<>();
+		
+		Usuario usuario = userService.findById(id);
+		
+		if (!archivo.isEmpty()) {
+			// Con el randomUUID, le asignamos un identificador unico aleatorio al nombre del archivo,
+			// es decir seria 111_nombreArchivo, por ejemplo.
+			String nombreArchivo = UUID.randomUUID().toString() + "_" +archivo.getOriginalFilename().replace(" ", "");
+			Path rutaArchivo = Paths.get("uploads").resolve(nombreArchivo).toAbsolutePath();
+			
+			try {
+				// copiamos el archivo subido al servidor a la ruta escogida
+				Files.copy(archivo.getInputStream(), rutaArchivo);
+			} catch (IOException e) {				
+				response.put("mensaje","Error al subir la foto.");
+				response.put("error",e.getMessage().concat(":").concat(e.getCause().getMessage()));
+				return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			
+			String nombreFotoAnterior = usuario.getFoto();
+			
+			if (nombreFotoAnterior != null && nombreFotoAnterior.length() > 0) {
+				Path rutaFotoAnterior = Paths.get("uploads").resolve(nombreFotoAnterior).toAbsolutePath();
+				File archivoFotoAnterior = rutaFotoAnterior.toFile();
+				if (archivoFotoAnterior.exists() && archivoFotoAnterior.canRead()) {
+					archivoFotoAnterior.delete();
+				}
+			}
+			
+			usuario.setFoto(nombreArchivo);
+			userService.save(usuario);
+			response.put("usuario", usuario);
+			response.put("mensaje","Has subido correctamente la imagen:" + nombreArchivo);
+		}
+		return new ResponseEntity<Map<String,Object>>(response, HttpStatus.CREATED);
+		
+	}
+	
+	
+	@RequestMapping(value="/clientes/img/{nombreFoto:.+}",method=RequestMethod.GET)
+	public ResponseEntity<Resource> verFoto(@PathVariable String nombreFoto){
+		Path rutaArchivo = Paths.get("uploads").resolve(nombreFoto).toAbsolutePath();
+		Resource recurso = null;
+		
+		try {
+			recurso = new UrlResource(rutaArchivo.toUri());
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		
+		if (recurso.exists() && !recurso.isReadable()) {
+			throw new RuntimeException("Error no se pudo cargar la imagen: " + nombreFoto);
+		}
+		
+		HttpHeaders cabecera = new HttpHeaders();
+		cabecera.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + recurso.getFilename() + "\"");
+		
+		// El recurso seria la url de la foto, la cabecera seria el httpheader con el content disposition para forzar la descarga y el codigo de estado OK
+		return new ResponseEntity<Resource>(recurso, cabecera, HttpStatus.OK);
+	}
+	
 }

@@ -2,6 +2,7 @@ package es.cjweb.fct.apirest.models.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -40,17 +41,16 @@ public class Cita implements Serializable {
 	@JoinColumn(name="user_id")
 	private Usuario user;
 	
-	
-
+	public Cita() {
+		
+	}
 	
 
 	public Date getFecha() {
 		return fecha;
 	}
 
-	public Cita() {
-		
-	}
+	
 
 	public int getId() {
 		return id;

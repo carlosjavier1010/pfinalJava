@@ -21,7 +21,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter{
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers(HttpMethod.GET,"/api/uploas/img/**").permitAll()
+		http.authorizeRequests().antMatchers(HttpMethod.GET,"/api/clientes/img/**").permitAll()
+		.antMatchers(HttpMethod.GET,"/api/clientes/img").permitAll()
+		.antMatchers(HttpMethod.POST,"/api/clientes").permitAll()
 		.anyRequest().authenticated()
 		.and().cors().configurationSource(corsConfigurationSource());
 		

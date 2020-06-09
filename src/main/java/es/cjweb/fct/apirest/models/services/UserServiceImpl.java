@@ -86,6 +86,13 @@ public class UserServiceImpl implements IUserService , UserDetailsService{
 		return userDao.findByNombre(username);
 	}
 
+	@Override
+	public void deleteById(Integer id) {
+		userDao.deleteById(id);
+		
+	}
+
+
 	
 
 }

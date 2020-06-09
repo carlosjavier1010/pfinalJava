@@ -10,4 +10,6 @@ public interface IRankingService{
 
 	public Ranking findById(Integer id);
 
+	public void save(Ranking create);
+
 }
