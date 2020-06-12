@@ -23,6 +23,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
@@ -37,12 +38,12 @@ public class Usuario implements Serializable{
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
+	@Column(nullable=false, unique=true)
 	private String email;
 	private String direccion;
 	private String pass;
 	private boolean verified;
-	private String verification_token;
-	private boolean user_admin;
+	@Column(nullable=false, unique=true)
 	private int movil;
 	@Column(name="fecha_registro")
 	@Temporal(TemporalType.DATE)
@@ -66,16 +67,16 @@ public class Usuario implements Serializable{
 	@JsonIgnoreProperties(value={"user", "hibernateLazyInitializer", "handler"}, allowSetters=true)
 	@OneToMany(mappedBy = "user",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
 	private List<Archivo> archivos;
-
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	
+	@JsonIgnoreProperties(value={"user", "hibernateLazyInitializer", "handler"}, allowSetters=true)
+	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name="usersroles", joinColumns = @JoinColumn(name="user_id"),
 	inverseJoinColumns = @JoinColumn(name="role_id"),
 	uniqueConstraints = {@UniqueConstraint(columnNames= {"user_id","role_id"})})
 	private List<Role> roles;
 	
-	public void setVerified(boolean verified) {
-		this.verified = verified;
-	}
+	
 
 
 
@@ -83,7 +84,7 @@ public class Usuario implements Serializable{
 		
 		this.archivos = new ArrayList<Archivo>();
 		this.citas = new ArrayList<Cita>();
-		
+		this.roles = new ArrayList<Role>();
 	}
 
 
@@ -127,18 +128,7 @@ public class Usuario implements Serializable{
 	public void setVerify(boolean verified) {
 		this.verified = verified;
 	}
-	public String getVerification_token() {
-		return verification_token;
-	}
-	public void setVerification_token(String verification_token) {
-		this.verification_token = verification_token;
-	}
-	public boolean isUser_admin() {
-		return user_admin;
-	}
-	public void setUser_admin(boolean user_admin) {
-		this.user_admin = user_admin;
-	}
+
 	public int getMovil() {
 		return movil;
 	}
@@ -196,8 +186,8 @@ public class Usuario implements Serializable{
 
 
 
-	public void setRoles(List<Role> roles) {
-		this.roles = roles;
+	public void setRoles(Role roles) {
+		this.roles.add(roles);
 	}
 
 

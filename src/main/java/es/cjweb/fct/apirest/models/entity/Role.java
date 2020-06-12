@@ -18,6 +18,15 @@ public class Role implements Serializable {
 	private String nombre;
 	
 	
+	
+	public Role() {
+		
+	}
+
+	public Role(int i) {
+		this.id = i;
+	}
+
 	public int getId() {
 		return id;
 	}

@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +34,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 
 import es.cjweb.fct.apirest.models.entity.Cita;
 import es.cjweb.fct.apirest.models.entity.Ranking;
+import es.cjweb.fct.apirest.models.entity.Role;
 import es.cjweb.fct.apirest.models.entity.Usuario;
 import es.cjweb.fct.apirest.models.services.IRankingService;
 import es.cjweb.fct.apirest.models.services.IUserService;
@@ -50,6 +55,11 @@ public class UserRestController {
 	@Autowired
 	private IRankingService rankService;
 	
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
+	
+	
+	@Secured({"ROLE_ADMIN"})
 	@RequestMapping(value="/clientes",method=RequestMethod.GET)
 	public List<Usuario> findAll(){
 		return this.userService.findAll();
@@ -71,11 +81,24 @@ public class UserRestController {
 		return this.userService.findById(id);
 	}
 	
+	@Secured({"ROLE_ADMIN","ROLE_USER"})
+	@RequestMapping(value="/clientes/maspelaos",method=RequestMethod.GET)
+	public List<Usuario> findTop3ByOrderByCantidadDesc(){
+		
+		return this.userService.findTop3ByOrderByCantidadDesc();
+	}
+	
+	@Secured({"ROLE_ADMIN","ROLE_USER"})
+	@RequestMapping(value="/clientes/maspelaos/ranking",method=RequestMethod.GET)
+	public List<Usuario> findAllByOrderByCantidadDesc(){
+		
+		return this.userService.findAllByOrderByCantidadDesc();
+	}
+	
 	
 	@RequestMapping(value="/clientes",method=RequestMethod.POST, produces = { MimeTypeUtils.APPLICATION_JSON_VALUE},
 			consumes = { MimeTypeUtils.APPLICATION_JSON_VALUE })	
-	@ResponseStatus(HttpStatus.CREATED)
-	public Usuario create(@RequestBody Usuario usuario){
+	public ResponseEntity<?> create(@RequestBody Usuario usuario){
 		usuario.setVerify(true);
 		
 		List<Ranking> rank = rankService.findAll();
@@ -91,9 +114,28 @@ public class UserRestController {
 		create.setPosicion(valorMin);
 		this.rankService.save(create);
 		usuario.setCod_rank(valorMin);
-		return this.userService.save(usuario);
+		usuario.setPass(passwordEncoder.encode(usuario.getPass()));
+		
+		usuario.setRoles(new Role(1));
+		usuario.setVerify(true);
+		
+		Usuario usuarioNew = null;
+		Map<String,Object> response = new HashMap<>();
+		
+		try {
+			 usuarioNew = this.userService.save(usuario);
+		} catch (DataAccessException e) {
+			response.put("mensaje","Error al crear su usuario, el correo o telefono proporcionado ya existe");
+			response.put("error",e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+			return new ResponseEntity<Map<String,Object>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		response.put("mensaje","El usuario ha sido creado con éxito!");
+		response.put("usuario",usuarioNew);
+		return new ResponseEntity<Map<String,Object>>(response,HttpStatus.CREATED);
 	}
 	
+	@Secured({"ROLE_ADMIN","ROLE_USER"})
 	@RequestMapping(value="/clientes/{id}",method=RequestMethod.PUT)
 	public Usuario update(@RequestBody Usuario usuario, @PathVariable Integer id){
 		Usuario usuarioActual = userService.findById(id);
@@ -102,6 +144,7 @@ public class UserRestController {
 		usuarioActual.setEmail(usuario.getEmail());
 		usuarioActual.setDireccion(usuario.getDireccion());
 		usuarioActual.setMovil(usuario.getMovil());
+		usuarioActual.setVerify(usuario.isVerified());
 		return this.userService.save(usuarioActual);
 	}
 	

@@ -92,6 +92,18 @@ public class UserServiceImpl implements IUserService , UserDetailsService{
 		
 	}
 
+	@Override
+	public List<Usuario> findTop3ByOrderByCantidadDesc() {
+		
+		return userDao.findTop3ByOrderByCantidadDesc();
+	}
+
+	@Override
+	public List<Usuario> findAllByOrderByCantidadDesc() {
+		
+		return userDao.findAllByOrderByCantidadDesc();
+	}
+
 
 	
 

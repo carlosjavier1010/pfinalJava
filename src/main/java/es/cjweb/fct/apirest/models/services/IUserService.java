@@ -19,7 +19,10 @@ public interface IUserService {
 	public Usuario findByEmail(String username);
 
 	public Usuario findByNombre(String username);
-
-
+	
+	public List<Usuario> findTop3ByOrderByCantidadDesc();
+	
+	public List<Usuario> findAllByOrderByCantidadDesc();
+	
 	public void deleteById(Integer id);
 }
