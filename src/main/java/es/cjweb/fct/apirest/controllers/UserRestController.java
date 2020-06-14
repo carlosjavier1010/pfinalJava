@@ -114,38 +114,78 @@ public class UserRestController {
 		create.setPosicion(valorMin);
 		this.rankService.save(create);
 		usuario.setCod_rank(valorMin);
-		usuario.setPass(passwordEncoder.encode(usuario.getPass()));
 		
 		usuario.setRoles(new Role(1));
 		usuario.setVerify(true);
+		
 		
 		Usuario usuarioNew = null;
 		Map<String,Object> response = new HashMap<>();
 		
 		try {
-			 usuarioNew = this.userService.save(usuario);
+			 
+			 if (usuario.getPass() == null || usuario.getPass() == "") {
+				 
+				 response.put("mensaje","Error al crear su usuario, la contraseña no puede estar vacía.");
+				 
+			}else {
+				usuario.setPass(passwordEncoder.encode(usuario.getPass()));
+				
+			}
+			
+			 response.put("mensaje","El usuario ha sido creado con éxito!");
+				response.put("usuario",usuarioNew);
+				if (usuario.getNombre().length()==0) {
+					response.put("mensaje","Error al crear su usuario, el nombre no puede estar vacío.");
+					return new ResponseEntity<Map<String,Object>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+				}else if(usuario.getPass() == "" || usuario.getPass() == null) {
+					response.put("mensaje","Error al crear su usuario, la contraseña no puede estar vacía.");
+					return new ResponseEntity<Map<String,Object>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+				else {
+					usuarioNew = this.userService.save(usuario);
+					return new ResponseEntity<Map<String,Object>>(response,HttpStatus.CREATED);
+				}
+		
 		} catch (DataAccessException e) {
+			
+			
 			response.put("mensaje","Error al crear su usuario, el correo o telefono proporcionado ya existe");
+			
+		
 			response.put("error",e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
 			return new ResponseEntity<Map<String,Object>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		response.put("mensaje","El usuario ha sido creado con éxito!");
-		response.put("usuario",usuarioNew);
-		return new ResponseEntity<Map<String,Object>>(response,HttpStatus.CREATED);
+		
+		
 	}
 	
 	@Secured({"ROLE_ADMIN","ROLE_USER"})
 	@RequestMapping(value="/clientes/{id}",method=RequestMethod.PUT)
-	public Usuario update(@RequestBody Usuario usuario, @PathVariable Integer id){
-		Usuario usuarioActual = userService.findById(id);
-		usuarioActual.setNombre(usuario.getNombre());
-		usuarioActual.setApellidos(usuario.getApellidos());
-		usuarioActual.setEmail(usuario.getEmail());
-		usuarioActual.setDireccion(usuario.getDireccion());
-		usuarioActual.setMovil(usuario.getMovil());
-		usuarioActual.setVerify(usuario.isVerified());
-		return this.userService.save(usuarioActual);
+	public ResponseEntity<?> update(@RequestBody Usuario usuario, @PathVariable Integer id){
+		Map<String,Object> response = new HashMap<>();
+		
+		Usuario usuarioNew = null;
+		try {
+			Usuario usuarioActual = userService.findById(id);
+			usuarioActual.setNombre(usuario.getNombre());
+			usuarioActual.setApellidos(usuario.getApellidos());
+			usuarioActual.setEmail(usuario.getEmail());
+			usuarioActual.setDireccion(usuario.getDireccion());
+			usuarioActual.setMovil(usuario.getMovil());
+			usuarioActual.setVerify(usuario.isVerified());
+			usuarioNew = this.userService.save(usuarioActual);
+		} catch (DataAccessException e) {
+			response.put("mensaje","Error al modificar su usuario, el correo o telefono proporcionado ya existe");
+			response.put("error",e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+			return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		response.put("mensaje","Los datos se han modificado con éxito!");
+		response.put("usuario",usuarioNew);
+		
+		return new ResponseEntity<Map<String,Object>>(response, HttpStatus.CREATED);
 	}
 	
 	// @Secured({"ROLE_ADMIN"})
@@ -169,6 +209,8 @@ public class UserRestController {
 	
 	@PostMapping("/clientes/upload")
 	public ResponseEntity<?> upload(@RequestParam("archivo") MultipartFile archivo, @RequestParam("id") Integer id){
+		
+		
 		Map<String,Object> response = new HashMap<>();
 		
 		Usuario usuario = userService.findById(id);
@@ -177,7 +219,7 @@ public class UserRestController {
 			// Con el randomUUID, le asignamos un identificador unico aleatorio al nombre del archivo,
 			// es decir seria 111_nombreArchivo, por ejemplo.
 			String nombreArchivo = UUID.randomUUID().toString() + "_" +archivo.getOriginalFilename().replace(" ", "");
-			Path rutaArchivo = Paths.get("uploads").resolve(nombreArchivo).toAbsolutePath();
+			Path rutaArchivo = Paths.get("src/main/resources/uploads").resolve(nombreArchivo).toAbsolutePath();
 			
 			try {
 				// copiamos el archivo subido al servidor a la ruta escogida
@@ -210,7 +252,7 @@ public class UserRestController {
 	
 	@RequestMapping(value="/clientes/img/{nombreFoto:.+}",method=RequestMethod.GET)
 	public ResponseEntity<Resource> verFoto(@PathVariable String nombreFoto){
-		Path rutaArchivo = Paths.get("uploads").resolve(nombreFoto).toAbsolutePath();
+		Path rutaArchivo = Paths.get("src/main/resources/uploads").resolve(nombreFoto).toAbsolutePath();
 		Resource recurso = null;
 		
 		try {

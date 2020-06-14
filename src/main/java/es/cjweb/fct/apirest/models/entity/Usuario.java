@@ -22,6 +22,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Min;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -41,6 +42,7 @@ public class Usuario implements Serializable{
 	@Column(nullable=false, unique=true)
 	private String email;
 	private String direccion;
+	@Column(nullable=false)
 	private String pass;
 	private boolean verified;
 	@Column(nullable=false, unique=true)
@@ -48,6 +50,7 @@ public class Usuario implements Serializable{
 	@Column(name="fecha_registro")
 	@Temporal(TemporalType.DATE)
 	private Date fechaRegistro;
+	@Column(nullable=false)
 	private String nombre;
 	private String apellidos;
 	private String foto;
